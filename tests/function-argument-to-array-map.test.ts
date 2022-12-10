@@ -40,19 +40,19 @@ ruleTester.run('function-argument-to-array-map', rule, {
         }
       ]
     },
-    // {
-    //   code: `
-    //   class Test {
-    //     public some = (arg) => arg+1;
-    //   }
-    //   const test = new Test();
-    //   [].map(arg => test.some(arg));`,
-    //   errors: [
-    //     {
-    //       messageId,
-    //       line: 6
-    //     }
-    //   ]
-    // }
+    {
+      code: `
+      class Test {
+        public some = (arg) => arg+1;
+      }
+      const test = new Test();
+      [].map(arg => test.some(arg));`,
+      errors: [
+        {
+          messageId,
+          line: 6
+        }
+      ]
+    }
   ]
 });

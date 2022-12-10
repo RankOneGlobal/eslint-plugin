@@ -1,4 +1,4 @@
-import { ESLintUtils } from '@typescript-eslint/utils';
+import { ESLintUtils, AST_NODE_TYPES } from '@typescript-eslint/utils';
 
 const MSG = 'unnecessary';
 
@@ -30,28 +30,37 @@ const rule = createRule({
         }
 
         const anonymousFunc = node.arguments[0];
-        if (anonymousFunc.type !== 'FunctionExpression') {
+
+        // If the following args are equal then the anonymous function wrapper is redundant.
+        const argsToAnonymousFunction = anonymousFunc.params;
+        let argsToRightHandFunction: any[] = [];
+
+        if (anonymousFunc.type === AST_NODE_TYPES.ArrowFunctionExpression) {
+          if (anonymousFunc.body.callee.type === AST_NODE_TYPES.MemberExpression) {
+            argsToRightHandFunction = anonymousFunc.body.arguments;
+          } else {
+            return;
+          }
+        } else if (anonymousFunc.type === AST_NODE_TYPES.FunctionExpression) {
+          const returnStatement = anonymousFunc.body.body.find(function (statement: any) {
+            return statement.type === AST_NODE_TYPES.ReturnStatement;
+          });
+
+          if (returnStatement?.argument.type !== AST_NODE_TYPES.CallExpression) {
+            return;
+          }
+
+          argsToRightHandFunction = returnStatement.argument.arguments;
+        } else {
           return;
         }
 
-        const returnStatement = anonymousFunc.body.body.find(function (statement: any) {
-          return statement.type === 'ReturnStatement';
-        });
-
-        if (!returnStatement) {
+        if (argsToAnonymousFunction.length !== argsToRightHandFunction.length) {
           return;
         }
 
-        if (returnStatement.argument.type !== 'CallExpression') {
-          return;
-        }
-
-        if (anonymousFunc.params.length !== returnStatement.argument.arguments.length) {
-          return;
-        }
-
-        const difference = anonymousFunc.params.some(function (param: any, i: number) {
-          return returnStatement.argument.arguments[i].name !== param.name;
+        const difference = argsToAnonymousFunction.some(function (param: any, i: number) {
+          return argsToRightHandFunction[i].name !== param.name;
         });
 
         if (!difference) {
@@ -63,73 +72,3 @@ const rule = createRule({
 });
 
 export default rule;
-
-// /** @type {import('eslint').Rule.RuleModule} */
-// module.exports = {
-//   meta: {
-//     messages: {
-//       [MSG]: 'Unnecessary anonymous function wrapper'
-//     },
-//     type: 'suggestion',
-//     docs: {
-//       description:
-//         'Enforce function argument to Array.map() instead of anonymous function that passes through arguments.',
-//       recommended: true,
-//       url: null // URL to the documentation page for this rule
-//     },
-//     fixable: null, // Or `code` or `whitespace`
-//     schema: [] // Add a schema if the rule has options
-//   },
-
-//   create(context) {
-//     // variables should be defined here
-
-//     //----------------------------------------------------------------------
-//     // Helpers
-//     //----------------------------------------------------------------------
-
-//     // any helper functions should go here or else delete this section
-
-//     //----------------------------------------------------------------------
-//     // Public
-//     //----------------------------------------------------------------------
-
-//     return {
-//       // https://eslint.org/docs/latest/developer-guide/selectors
-//       'CallExpression[callee.type="MemberExpression"][callee.property.name="map"]': function (node) {
-//         if (node.arguments.length !== 1) {
-//           return;
-//         }
-
-//         const anonymousFunc = node.arguments[0];
-//         if (anonymousFunc.type !== 'FunctionExpression') {
-//           return;
-//         }
-
-//         const returnStatement = anonymousFunc.body.body.find(function (statement) {
-//           return statement.type === 'ReturnStatement';
-//         });
-
-//         if (!returnStatement) {
-//           return;
-//         }
-
-//         if (returnStatement.argument.type !== 'CallExpression') {
-//           return;
-//         }
-
-//         if (anonymousFunc.params.length !== returnStatement.argument.arguments.length) {
-//           return;
-//         }
-
-//         const difference = anonymousFunc.params.some(function (param, i) {
-//           return returnStatement.argument.arguments[i].name !== param.name;
-//         });
-
-//         if (!difference) {
-//           context.report({ node, messageId: MSG });
-//         }
-//       }
-//     };
-//   }
-// };
