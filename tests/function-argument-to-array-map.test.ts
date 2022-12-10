@@ -12,6 +12,8 @@ const ruleTester = new TSESLint.RuleTester({
 // Tests
 //------------------------------------------------------------------------------
 const messageId = 'unnecessary';
+
+// https://github.com/typescript-eslint/typescript-eslint/blob/6c3816b3831e6e683c1a7842196b34248803d69b/packages/experimental-utils/src/ts-eslint/RuleTester.ts
 ruleTester.run('function-argument-to-array-map', rule, {
   valid: [
     { code: 'var someFunc = function(arg) { return arg+1; }; [].map(someFunc);' },
@@ -36,6 +38,16 @@ ruleTester.run('function-argument-to-array-map', rule, {
         {
           messageId,
           line: 3
+        }
+      ]
+    },
+    {
+      code: `var someFunc = function(...args) { };
+      [].map((...args) => someFunc(...args));`,
+      errors: [
+        {
+          messageId,
+          line: 2
         }
       ]
     },

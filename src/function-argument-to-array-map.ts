@@ -36,7 +36,7 @@ const rule = createRule({
         let argsToRightHandFunction: any[] = [];
 
         if (anonymousFunc.type === AST_NODE_TYPES.ArrowFunctionExpression) {
-          if (anonymousFunc.body.callee.type === AST_NODE_TYPES.MemberExpression) {
+          if (anonymousFunc.body.type === AST_NODE_TYPES.CallExpression) {
             argsToRightHandFunction = anonymousFunc.body.arguments;
           } else {
             return;
