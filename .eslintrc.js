@@ -2,14 +2,23 @@
 
 module.exports = {
   root: true,
-  extends: ['eslint:recommended', 'plugin:eslint-plugin/recommended', 'plugin:node/recommended'],
+  parser: '@typescript-eslint/parser',
+  plugins: ['@typescript-eslint'],
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/eslint-recommended',
+    'plugin:@typescript-eslint/recommended'
+  ],
   env: {
     node: true
   },
   overrides: [
     {
-      files: ['tests/**/*.js'],
+      files: ['tests/**/*.ts'],
       env: { mocha: true }
     }
-  ]
+  ],
+  rules: {
+    '@typescript-eslint/no-explicit-any': 'off'
+  }
 };

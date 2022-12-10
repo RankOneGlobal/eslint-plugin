@@ -28,19 +28,11 @@ Add `rankone` to the plugins section of your `.eslintrc` configuration file. You
 }
 ```
 
-
-Then configure the rules you want to use under the rules section.
-
-```json
-{
-    "rules": {
-        "rankone/rule-name": 2
-    }
-}
-```
-
 ## Supported Rules
 
-* Fill in provided rules here
+`function-argument-to-array-map`
+
+Enforce function argument to Array.map() instead of anonymous function that passes through arguments.
+
 
 
