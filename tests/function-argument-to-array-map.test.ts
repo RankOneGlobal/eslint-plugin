@@ -3,11 +3,10 @@ import rule from '../src/function-argument-to-array-map';
 
 const ruleTester = new TSESLint.RuleTester({
   parserOptions: {
-    warnOnUnsupportedTypeScriptVersion: false,
+    warnOnUnsupportedTypeScriptVersion: false
   },
-  parser: require.resolve('@typescript-eslint/parser'),
+  parser: require.resolve('@typescript-eslint/parser')
 });
-
 
 //------------------------------------------------------------------------------
 // Tests
@@ -15,8 +14,8 @@ const ruleTester = new TSESLint.RuleTester({
 const messageId = 'unnecessary';
 ruleTester.run('function-argument-to-array-map', rule, {
   valid: [
-    { code: 'var someFunc = function(arg) { return arg+1; }; [].map(someFunc);'},
-    { code: 'var someList = [1, 2]; var someFunc = function(arg1, arg2) { }; someList.map(someFunc);'}
+    { code: 'var someFunc = function(arg) { return arg+1; }; [].map(someFunc);' },
+    { code: 'var someList = [1, 2]; var someFunc = function(arg1, arg2) { }; someList.map(someFunc);' }
   ],
   invalid: [
     {
@@ -41,8 +40,7 @@ ruleTester.run('function-argument-to-array-map', rule, {
       ]
     },
     {
-      code: `
-      class Test {
+      code: `class Test {
         public some = (arg) => arg+1;
       }
       const test = new Test();
@@ -50,7 +48,7 @@ ruleTester.run('function-argument-to-array-map', rule, {
       errors: [
         {
           messageId,
-          line: 6
+          line: 5
         }
       ]
     }
