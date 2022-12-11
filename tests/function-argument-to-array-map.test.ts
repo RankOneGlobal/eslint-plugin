@@ -28,7 +28,9 @@ ruleTester.run('function-argument-to-array-map', rule, {
           messageId,
           line: 2
         }
-      ]
+      ],
+      output: `var someFunc = function(arg) { return arg+1; };
+      var x = [].map(someFunc);`
     },
     {
       code: `var someList = [1,2];
@@ -39,7 +41,10 @@ ruleTester.run('function-argument-to-array-map', rule, {
           messageId,
           line: 3
         }
-      ]
+      ],
+      output: `var someList = [1,2];
+      var someFunc = function(arg1, arg2) { };
+      someList.map(someFunc);`
     },
     {
       code: `var someFunc = function(...args) { };
@@ -49,7 +54,9 @@ ruleTester.run('function-argument-to-array-map', rule, {
           messageId,
           line: 2
         }
-      ]
+      ],
+      output: `var someFunc = function(...args) { };
+      [].map(someFunc);`
     },
     {
       code: `class Test {
@@ -62,7 +69,12 @@ ruleTester.run('function-argument-to-array-map', rule, {
           messageId,
           line: 5
         }
-      ]
+      ],
+      output: `class Test {
+        public some = (arg) => arg+1;
+      }
+      const test = new Test();
+      [].map(test.some);`
     }
   ]
 });

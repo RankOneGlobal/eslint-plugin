@@ -39,7 +39,9 @@ Enforce function argument to Array.map() instead of anonymous function that pass
 
 Can be tested locally by [importing](https://docs.npmjs.com/cli/v9/configuring-npm/package-json#local-paths) from the local file system.
 
-Run `npm i -D ../eslint-plugin` (relative path may differ)
+First, build the plugin with `npm run build`.
+
+Then go to the project where you wish to try it and run `npm i -D ../eslint-plugin` (relative path may differ)
 
 This should add someting like this to `package.json`:
 

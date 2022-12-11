@@ -17,7 +17,7 @@ const rule = createRule({
       recommended: 'error',
       requiresTypeChecking: false
     },
-    fixable: undefined, // Or `code` or `whitespace`
+    fixable: 'code',
     schema: [] // Add a schema if the rule has options
   },
   defaultOptions: [],
@@ -35,11 +35,23 @@ const rule = createRule({
         const argsToAnonymousFunction = anonymousFunc.params;
         let argsToRightHandFunction: any[] = [];
 
+        let fix = undefined;
+
         if (anonymousFunc.type === AST_NODE_TYPES.ArrowFunctionExpression) {
           if (anonymousFunc.body.type === AST_NODE_TYPES.CallExpression) {
             argsToRightHandFunction = anonymousFunc.body.arguments;
+
+            if (anonymousFunc.body.callee.type === AST_NODE_TYPES.MemberExpression) {
+              // The anonymous function is calling the method of an object.
+              const classInstance = anonymousFunc.body.callee.object.name;
+              const classMethod = anonymousFunc.body.callee.property.name;
+
+              fix = (fixer: any) => fixer.replaceText(anonymousFunc, `${classInstance}.${classMethod}`);
+            } else {
+              fix = (fixer: any) => fixer.replaceText(anonymousFunc, anonymousFunc.body.callee.name);
+            }
           } else {
-            return;
+            return; // Unhandled or not breaking the rule
           }
         } else if (anonymousFunc.type === AST_NODE_TYPES.FunctionExpression) {
           const returnStatement = anonymousFunc.body.body.find(function (statement: any) {
@@ -47,16 +59,17 @@ const rule = createRule({
           });
 
           if (returnStatement?.argument.type !== AST_NODE_TYPES.CallExpression) {
-            return;
+            return; // Unhandled or not breaking the rule
           }
 
           argsToRightHandFunction = returnStatement.argument.arguments;
+          fix = (fixer: any) => fixer.replaceText(anonymousFunc, returnStatement.argument.callee.name);
         } else {
-          return;
+          return; // Unhandled or not breaking the rule
         }
 
         if (argsToAnonymousFunction.length !== argsToRightHandFunction.length) {
-          return;
+          return; // Unhandled or not breaking the rule
         }
 
         const difference = argsToAnonymousFunction.some(function (param: any, i: number) {
@@ -64,7 +77,11 @@ const rule = createRule({
         });
 
         if (!difference) {
-          context.report({ node, messageId: MSG });
+          context.report({
+            node,
+            messageId: MSG,
+            fix
+          });
         }
       }
     };
