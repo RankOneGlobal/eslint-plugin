@@ -7,30 +7,30 @@ RankOne ESLint plugin
 You'll first need to install [ESLint](https://eslint.org/):
 
 ```sh
-npm i eslint --save-dev
+npm i -D eslint
 ```
 
-Next, install `eslint-plugin-rankone`:
+Next, install `@rankone/eslint-plugin`:
 
 ```sh
-npm install eslint-plugin-rankone --save-dev
+npm i -D @rankone/eslint-plugin
 ```
 
 ## Usage
 
-Add `rankone` to the plugins section of your `.eslintrc` configuration file. You can omit the `eslint-plugin-` prefix:
+Add `@rankone/eslint-plugin` to the extends section of your `.eslintrc` configuration file.
 
 ```json
 {
-    "plugins": [
-        "rankone"
-    ]
+  "extends": [
+    "@rankone/eslint-plugin/recommended"
+  ]
 }
 ```
 
 ## Supported Rules
 
-`function-argument-to-array-map`
+`@rankone/function-argument-to-array-map`
 
 Enforce function argument to Array.map() instead of anonymous function that passes through arguments.
 
@@ -45,18 +45,20 @@ Then go to the project where you wish to try it and run `npm i -D ../eslint-plug
 
 This should add someting like this to `package.json`:
 
-```
+```json
 {
   "devDependencies": {
-    "eslint-plugin-rankone": "file:../eslint-plugin",
+    "@rankone/eslint-plugin": "file:../eslint-plugin",
   }
 }
 ```
 
 Add to `.eslintrc`:
 
-```
+```json
 {
-  plugins: ['rankone']
+  "extends": [
+    "@rankone/eslint-plugin/recommended"
+  ]
 }
 ```
