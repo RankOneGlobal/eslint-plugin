@@ -23,7 +23,7 @@ Add `@rankone/eslint-plugin` to the extends section of your `.eslintrc` configur
 ```json
 {
   "extends": [
-    "@rankone/eslint-plugin/recommended"
+    "plugin:@rankone/eslint-plugin/recommended"
   ]
 }
 ```
@@ -58,7 +58,7 @@ Add to `.eslintrc`:
 ```json
 {
   "extends": [
-    "@rankone/eslint-plugin/recommended"
+    "plugin:@rankone/eslint-plugin/recommended"
   ]
 }
 ```
