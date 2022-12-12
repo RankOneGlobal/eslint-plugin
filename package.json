@@ -1,5 +1,5 @@
 {
-  "name": "eslint-plugin-rankone",
+  "name": "@rankone/eslint-plugin",
   "version": "0.1.0",
   "description": "RankOne ESLint plugin",
   "keywords": [
@@ -10,7 +10,7 @@
   "author": "RankOne Global",
   "repository": {
     "type": "git",
-    "url": "https://github.com/RankOneGlobal/eslint-plugin.git"
+    "url": "git+https://github.com/RankOneGlobal/eslint-plugin.git"
   },
   "main": "dist/index.js",
   "scripts": {
@@ -18,7 +18,8 @@
     "prepare": "npm run build",
     "lint": "eslint --config .eslintrc --ext .ts src tests",
     "test:ci": "jest --coverage",
-    "test": "jest"
+    "test": "jest",
+    "prepublishOnly": "npm test && npm run build"
   },
   "dependencies": {
     "@typescript-eslint/utils": "5.42.1",
@@ -42,5 +43,13 @@
   "engines": {
     "node": "^14.17.0 || ^16.0.0 || >= 18.0.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/RankOneGlobal/eslint-plugin/issues"
+  },
+  "homepage": "https://github.com/RankOneGlobal/eslint-plugin#readme",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  }
 }
