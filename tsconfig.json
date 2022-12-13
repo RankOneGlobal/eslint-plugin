@@ -1,27 +1,24 @@
 {
   "compilerOptions": {
-    "forceConsistentCasingInFileNames": true,
-    "suppressImplicitAnyIndexErrors":  true,
-    "allowSyntheticDefaultImports": false,
-    "experimentalDecorators": true,
-    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "declaration": true,
+    "declarationMap": true,
     "esModuleInterop": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noUnusedLocals": true,
-    "noResolve": false,
-    "skipLibCheck": true,
-    "declaration": false,
-    "strict": true,
     "module": "commonjs",
-    "target": "es5",
-    "outDir": "dist",
-    "lib": ["es2015"]
+    "moduleResolution": "node",
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "pretty": true,
+    "sourceMap": true,
+    "strict": true,
+    "target": "es2017",
+    "lib": ["es2017"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "resolveJsonModule": true
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "dist"
-  ]
+  "include": ["src"]
 }

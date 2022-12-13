@@ -1,23 +1,48 @@
-import { TSESLint } from '@typescript-eslint/utils';
-import rule from '../src/function-argument-to-array-map';
+import rule from '../../src/function-argument-to-array-map';
+import { RuleTester, getFixturesRootDir } from '../RuleTester';
 
-const ruleTester = new TSESLint.RuleTester({
+const rootDir = getFixturesRootDir();
+const ruleTester = new RuleTester({
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    warnOnUnsupportedTypeScriptVersion: false
-  },
-  parser: require.resolve('@typescript-eslint/parser')
+    ecmaVersion: 2018,
+    tsconfigRootDir: rootDir,
+    project: './tsconfig.json'
+  }
 });
 
-//------------------------------------------------------------------------------
-// Tests
-//------------------------------------------------------------------------------
 const messageId = 'unnecessary';
 
 // https://github.com/typescript-eslint/typescript-eslint/blob/6c3816b3831e6e683c1a7842196b34248803d69b/packages/experimental-utils/src/ts-eslint/RuleTester.ts
 ruleTester.run('function-argument-to-array-map', rule, {
   valid: [
     { code: 'var someFunc = function(arg) { return arg+1; }; [].map(someFunc);' },
-    { code: 'var someList = [1, 2]; var someFunc = function(arg1, arg2) { }; someList.map(someFunc);' }
+    { code: 'var someList = [1, 2]; var someFunc = function(arg1, arg2) { }; someList.map(someFunc);' },
+    {
+      // Some functions take more parameters that we want to discard
+      code: `const someList = [{"test": true}];
+      someList.map((val) => JSON.stringify(val));`
+    },
+    {
+      code: `let y = 0;
+      const someFunc = (arg1) => 0;
+      [].map((arg1, i) => {
+        y += i;
+        return someFunc(arg1);
+      })`
+    },
+    {
+      code: `const someFunc = (arg1, s) => 0;
+      [].map((arg1) => someFunc(arg1, 'test'))`
+    },
+    {
+      code: `let y = 0;
+      const someFunc = (arg1, index) => 0;
+      [].map((arg1, i) => {
+        y += i;
+        return someFunc(arg1, i);
+      })`
+    }
   ],
   invalid: [
     {

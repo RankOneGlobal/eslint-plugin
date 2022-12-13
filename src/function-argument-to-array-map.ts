@@ -1,8 +1,7 @@
-import { ESLintUtils, AST_NODE_TYPES } from '@typescript-eslint/utils';
+import ts from 'typescript';
+import { createRule, AST_NODE_TYPES, getParserServices, TSESTree } from './utils';
 
 const MSG = 'unnecessary';
-
-const createRule = ESLintUtils.RuleCreator(() => '');
 
 const rule = createRule({
   name: 'function-argument-to-array-map',
@@ -21,7 +20,7 @@ const rule = createRule({
     schema: [] // Add a schema if the rule has options
   },
   defaultOptions: [],
-  create(context) {
+  create(context: any) {
     return {
       // https://eslint.org/docs/latest/developer-guide/selectors
       'CallExpression[callee.type="MemberExpression"][callee.property.name="map"]': function (node: any) {
@@ -43,10 +42,24 @@ const rule = createRule({
 
             if (anonymousFunc.body.callee.type === AST_NODE_TYPES.MemberExpression) {
               // The anonymous function is calling the method of an object.
-              const classInstance = anonymousFunc.body.callee.object.name;
+              const classOrInstance = anonymousFunc.body.callee.object.name;
               const classMethod = anonymousFunc.body.callee.property.name;
 
-              fix = (fixer: any) => fixer.replaceText(anonymousFunc, `${classInstance}.${classMethod}`);
+              // https://typescript-eslint.io/custom-rules/#type-checking
+              const parserServices = getParserServices(context);
+              const checker = parserServices.program.getTypeChecker();
+
+              const getType = (node: TSESTree.Expression): ts.Type =>
+                checker.getTypeAtLocation(parserServices.esTreeNodeToTSNodeMap.get(node));
+
+              const type = getType(anonymousFunc.body.callee.property);
+              const signatures = type.getCallSignatures();
+
+              if (!signatures.some((signature) => signature.parameters.length === 1)) {
+                return;
+              }
+
+              fix = (fixer: any) => fixer.replaceText(anonymousFunc, `${classOrInstance}.${classMethod}`);
             } else {
               fix = (fixer: any) => fixer.replaceText(anonymousFunc, anonymousFunc.body.callee.name);
             }

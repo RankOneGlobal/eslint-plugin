@@ -1,9 +1,7 @@
-import functionArgumentToArrayMap from './function-argument-to-array-map';
+import rules from './rules';
 
 export = {
-  rules: {
-    'function-argument-to-array-map': functionArgumentToArrayMap
-  },
+  rules,
   configs: {
     recommended: {
       plugins: ['@rankone/eslint-plugin'],

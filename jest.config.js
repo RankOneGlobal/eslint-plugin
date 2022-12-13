@@ -1,9 +1,20 @@
+'use strict';
+
+// @ts-check
+/** @type {import('@jest/types').Config.InitialOptions} */
 module.exports = {
-  moduleFileExtensions: ['ts', 'js', 'json'],
-  collectCoverageFrom: ['src/**/*.{js,ts}'],
-  coverageReporters: ['text-summary', 'lcov'],
-  collectCoverage: false,
   testEnvironment: 'node',
-  transform: { '^.+\\.ts$': 'ts-jest' },
+  transform: {
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        isolatedModules: true
+      }
+    ]
+  },
   testRegex: './tests/.+\\.test\\.ts$',
-}
+  collectCoverage: false,
+  collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  coverageReporters: ['text-summary', 'lcov']
+};
