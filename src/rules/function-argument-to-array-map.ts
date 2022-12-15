@@ -1,5 +1,5 @@
 import ts from 'typescript';
-import { createRule, AST_NODE_TYPES, getParserServices, TSESTree } from './utils';
+import { createRule, AST_NODE_TYPES, getParserServices, TSESTree } from '../utils';
 
 const MSG = 'unnecessary';
 

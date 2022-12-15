@@ -1,4 +1,4 @@
-import rule from '../../src/function-argument-to-array-map';
+import rule from '../../src/rules/function-argument-to-array-map';
 import { RuleTester, getFixturesRootDir } from '../RuleTester';
 
 const rootDir = getFixturesRootDir();
