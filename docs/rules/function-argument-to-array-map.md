@@ -9,17 +9,13 @@ This rule aims to prevent redundant anonymous functions as arguments to `Array.m
 Examples of **incorrect** code for this rule:
 
 ```js
-
-[].map(arg => someFunc(arg))
-
+[].map((arg) => someFunc(arg));
 ```
 
 Examples of **correct** code for this rule:
 
 ```js
-
-[].map(someFunc)
-
+[].map(someFunc);
 ```
 
 ## When Not To Use It

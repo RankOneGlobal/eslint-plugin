@@ -3,6 +3,22 @@ import { createRule, AST_NODE_TYPES, getParserServices, TSESTree } from '../util
 
 const MSG = 'unnecessary';
 
+// context.sourceCode only exists from ESLint 8.40, and context.getSourceCode() is removed in ESLint 10.
+const getSourceCode = (context: any) => context.sourceCode ?? context.getSourceCode();
+
+// Destructuring patterns and object or array literals have no name, so comparing names alone treats them as equal.
+const isPassedThrough = (param: any, argument: any): boolean => {
+  if (param.type === AST_NODE_TYPES.Identifier && argument.type === AST_NODE_TYPES.Identifier) {
+    return param.name === argument.name;
+  }
+
+  if (param.type === AST_NODE_TYPES.RestElement && argument.type === AST_NODE_TYPES.SpreadElement) {
+    return isPassedThrough(param.argument, argument.argument);
+  }
+
+  return false;
+};
+
 const rule = createRule({
   name: 'function-argument-to-array-map',
   meta: {
@@ -34,7 +50,7 @@ const rule = createRule({
         const argsToAnonymousFunction = anonymousFunc.params;
         let argsToRightHandFunction: any[] = [];
 
-        let fix = undefined;
+        let fix;
 
         if (anonymousFunc.type === AST_NODE_TYPES.ArrowFunctionExpression) {
           if (anonymousFunc.body.type === AST_NODE_TYPES.CallExpression) {
@@ -42,11 +58,12 @@ const rule = createRule({
 
             if (anonymousFunc.body.callee.type === AST_NODE_TYPES.MemberExpression) {
               // The anonymous function is calling the method of an object.
-              const classOrInstance = anonymousFunc.body.callee.object.name;
-              const classMethod = anonymousFunc.body.callee.property.name;
-
               // https://typescript-eslint.io/custom-rules/#type-checking
-              const parserServices = getParserServices(context);
+              // Without type information the method's arity is unknown, so it isn't reported rather than crashing.
+              const parserServices = getParserServices(context, true);
+              if (!parserServices.hasFullTypeInformation) {
+                return;
+              }
               const checker = parserServices.program.getTypeChecker();
 
               const getType = (node: TSESTree.Expression): ts.Type =>
@@ -58,11 +75,11 @@ const rule = createRule({
               if (!signatures.some((signature) => signature.parameters.length === 1)) {
                 return;
               }
-
-              fix = (fixer: any) => fixer.replaceText(anonymousFunc, `${classOrInstance}.${classMethod}`);
-            } else {
-              fix = (fixer: any) => fixer.replaceText(anonymousFunc, anonymousFunc.body.callee.name);
             }
+
+            // Source text rather than names, so callees like `this.method` survive the fix.
+            fix = (fixer: any) =>
+              fixer.replaceText(anonymousFunc, getSourceCode(context).getText(anonymousFunc.body.callee));
           } else {
             return; // Unhandled or not breaking the rule
           }
@@ -76,7 +93,8 @@ const rule = createRule({
           }
 
           argsToRightHandFunction = returnStatement.argument.arguments;
-          fix = (fixer: any) => fixer.replaceText(anonymousFunc, returnStatement.argument.callee.name);
+          fix = (fixer: any) =>
+            fixer.replaceText(anonymousFunc, getSourceCode(context).getText(returnStatement.argument.callee));
         } else {
           return; // Unhandled or not breaking the rule
         }
@@ -86,7 +104,7 @@ const rule = createRule({
         }
 
         const difference = argsToAnonymousFunction.some(function (param: any, i: number) {
-          return argsToRightHandFunction[i].name !== param.name;
+          return !isPassedThrough(param, argsToRightHandFunction[i]);
         });
 
         if (!difference) {

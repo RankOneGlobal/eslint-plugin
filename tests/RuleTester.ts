@@ -1,10 +1,8 @@
-import { ESLintUtils } from '@typescript-eslint/experimental-utils'
-import * as path from 'path'
+import { ESLintUtils } from '@typescript-eslint/utils';
+import * as path from 'path';
 
-function getFixturesRootDir(): string {
-  return path.join(__dirname, 'fixtures')
+export const { RuleTester } = ESLintUtils;
+
+export function getFixturesRootDir(): string {
+  return path.join(__dirname, 'fixtures');
 }
-
-const { batchedSingleLineTests, RuleTester, noFormat } = ESLintUtils
-
-export { batchedSingleLineTests, getFixturesRootDir, noFormat, RuleTester }

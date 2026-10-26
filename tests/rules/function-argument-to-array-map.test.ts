@@ -13,7 +13,7 @@ const ruleTester = new RuleTester({
 
 const messageId = 'unnecessary';
 
-// https://github.com/typescript-eslint/typescript-eslint/blob/6c3816b3831e6e683c1a7842196b34248803d69b/packages/experimental-utils/src/ts-eslint/RuleTester.ts
+// https://github.com/typescript-eslint/typescript-eslint/blob/v5.62.0/packages/utils/src/eslint-utils/rule-tester/RuleTester.ts
 ruleTester.run('function-argument-to-array-map', rule, {
   valid: [
     { code: 'var someFunc = function(arg) { return arg+1; }; [].map(someFunc);' },
@@ -42,6 +42,20 @@ ruleTester.run('function-argument-to-array-map', rule, {
         y += i;
         return someFunc(arg1, i);
       })`
+    },
+    {
+      // A destructured parameter rebuilt into an object is not passed through
+      code: `const someFunc = (arg) => 0;
+      const extra = 1;
+      [].map(({ value }) => someFunc({ value, extra }))`
+    },
+    {
+      code: `const someFunc = (arg) => 0;
+      [].map(([first]) => someFunc([first]))`
+    },
+    {
+      code: `const someFunc = (arg) => 0;
+      [].map((arg) => someFunc({ arg }))`
     }
   ],
   invalid: [
@@ -100,6 +114,49 @@ ruleTester.run('function-argument-to-array-map', rule, {
       }
       const test = new Test();
       [].map(test.some);`
+    },
+    {
+      code: `class Test {
+        public some = (arg) => arg+1;
+        public run() {
+          return [].map(arg => this.some(arg));
+        }
+      }`,
+      errors: [
+        {
+          messageId,
+          line: 4
+        }
+      ],
+      output: `class Test {
+        public some = (arg) => arg+1;
+        public run() {
+          return [].map(this.some);
+        }
+      }`
     }
   ]
 });
+
+// The rule doesn't require type checking, so it must not crash on a method call without type information.
+new RuleTester({ parser: '@typescript-eslint/parser' }).run(
+  'function-argument-to-array-map without type information',
+  rule,
+  {
+    valid: [
+      {
+        code: `const test = { some: (arg) => arg + 1 };
+      [].map((arg) => test.some(arg));`
+      }
+    ],
+    invalid: [
+      {
+        code: `const someFunc = (arg) => arg + 1;
+      [].map((arg) => someFunc(arg));`,
+        errors: [{ messageId, line: 2 }],
+        output: `const someFunc = (arg) => arg + 1;
+      [].map(someFunc);`
+      }
+    ]
+  }
+);
