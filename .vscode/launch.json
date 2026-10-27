@@ -7,12 +7,7 @@
       "name": "Run/debug Jest tests",
       "cwd": "${workspaceFolder}/src/",
       "program": "${workspaceFolder}/node_modules/jest/bin/jest.js",
-      "args": [
-        "--runInBand",
-        "--no-cache",
-        "--no-coverage",
-        "${fileBasenameNoExtension}"
-      ],
+      "args": ["--runInBand", "--no-cache", "--no-coverage", "${fileBasenameNoExtension}"],
       "sourceMaps": true,
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"

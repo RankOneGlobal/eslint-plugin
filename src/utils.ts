@@ -1,4 +1,4 @@
-import { ESLintUtils, AST_NODE_TYPES, TSESTree } from '@typescript-eslint/experimental-utils';
+import { ESLintUtils, AST_NODE_TYPES, TSESTree } from '@typescript-eslint/utils';
 
 const { getParserServices } = ESLintUtils;
 
